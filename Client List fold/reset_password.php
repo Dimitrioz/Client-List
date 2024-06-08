@@ -70,19 +70,27 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 }
 ?>
  
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
+    <body style="background-color: #A3C1AD; display: flex; justify-content: center; align-items: center; height: 100%;">
+    <div class="wrapper">
     <meta charset="UTF-8">
     <title>Reset Password</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        body{ font: 14px sans-serif; }
-        .wrapper{ width: 360px; padding: 20px; }
+        body {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+/* Style the form container */
+body{ font: 14px sans-serif; }
+        .wrapper{ width: 500px; padding: 80px; }
+    </style>
     </style>
 </head>
 <body>
-<body style="background-color: #add8e6;">
     <div class="wrapper">
         <h2>Reset Password</h2>
         <p>Please fill out this form to reset your password.</p>

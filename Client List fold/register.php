@@ -132,7 +132,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<body style="background-color: #add8e6; display: flex; justify-content: center; align-items: center; height: 100%;">
+<body style="background-color: #A3C1AD; display: flex; justify-content: center; align-items: center; height: 100%;">
   <div class="wrapper">
     <meta charset="UTF-8">
     <title>Sign Up</title>
@@ -150,7 +150,8 @@ body{ font: 14px sans-serif; }
 </head>
 <body>
 <body style="background-color: #add8e6;">
-    <div class="wrapper">
+   <div class="center">
+     <div class="wrapper">
         <h2>Sign Up</h2>
         <p>Please fill this form to create an account.</p>
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
