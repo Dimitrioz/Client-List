@@ -1,18 +1,53 @@
 <?php
 // Initialize the session
 session_start();
- 
-// Check if the user is logged in, if not then redirect him to login page
+
+// Check if the user is logged in, if not then redirect him to the login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
     exit;
-    if (isset($_POST['active'])) {
-        $id = intval($_POST['id']);
-        $active = intval($_POST['active']);
-        $sql = "UPDATE employees SET active = $active WHERE id = $id";
-        $connection->query($sql);
-      }
-      $active = intval(file_get_contents("active_$row[id].txt"));
+}
+
+// Define database connection variables
+$servername = "localhost";
+$username = "root";
+$password = "";
+$database = "test";
+
+// Create connection
+$connection = new mysqli($servername, $username, $password, $database);
+
+// Check connection
+if ($connection->connect_error) {
+    die("Connection failed: " . $connection->connect_error);
+}
+
+// Initialize query variable
+$query = "";
+
+// Check if search query is set
+if (isset($_GET['query'])) {
+    $query = $_GET['query'];
+    // Prepare SQL query with the search term
+    $sql = "SELECT * FROM employees WHERE name LIKE '%$query%' OR lastname LIKE '%$query%' OR address LIKE '%$query%' OR phone LIKE '%$query%' OR email LIKE '%$query%'";
+} else {
+    // Default SQL query to fetch all employees
+    $sql = "SELECT * FROM employees";
+}
+
+// Execute the query
+$result = $connection->query($sql);
+
+if (!$result) {
+    die("Invalid query: " . $connection->error);
+}
+
+// Handle form submission for activating/deactivating employees
+if (isset($_POST['active'])) {
+    $id = intval($_POST['id']);
+    $active = intval($_POST['active']);
+    $sql = "UPDATE employees SET active = $active WHERE id = $id";
+    $connection->query($sql);
 }
 ?>
 
@@ -24,8 +59,39 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My shop</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #suggestions {
+            border: 1px solid #ccc;
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000; /* Ensure suggestions appear above other content */
+        }
+        .suggestion-item {
+            padding: 5px;
+            cursor: pointer;
+        }
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+        .search-container {
+            position: relative;
+            display: inline-block;
+            margin-top: 20px; /* Add space from the upper buttons */
+        }
+        #search {
+            width: 300px; /* Adjust width as necessary */
+            padding-right: 30px; /* Ensure space for the clear button */
+        }
+        .clear-btn {
+            margin-left: 10px; /* Space between clear and search buttons */
+            display: none;
+        }
+    </style>
 </head>
-<body>
 <body style="background-color: #add8e6;"> 
     <div class="container my-5">
         <h2>List of Clients</h2> 
@@ -33,82 +99,54 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
         <a class="btn btn-warning" href="/test/logout.php" role="button">Logout</a>
         <a class="btn btn-danger" href="/test/reset_password.php" role="button">Change Your Password</a> 
         <br>
-        <form action="search.php" method="GET">
-  <input type="text" name="query">
-  <input type="submit" value="Search">
-</form>
+        <div class="search-container">
+            <form action="index.php" method="GET" class="d-flex">
+                <input type="text" id="search" name="query" value="<?php echo htmlspecialchars($query); ?>" autocomplete="off" class="form-control">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <button type="button" class="btn btn-secondary clear-btn" id="clear-btn">Clear</button>
+                <div id="suggestions"></div>
+            </form>
+        </div>
 
-</form>
-        <table class="table">
-            <thread>
+        <table class="table mt-3">
+            <thead>
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
-                    <th>Last_name</th>
+                    <th>Last Name</th>
                     <th>Address</th>
-                    <th>Phone_number</th>
+                    <th>Phone Number</th>
                     <th>Email</th>
                     <th>Date</th>
                     <th>Active</th>
+                    <th>Actions</th>
                 </tr>
-            </thread>
+            </thead>
             <tbody>
                 <?php
-                $servername = "localhost";
-                $username = "root";
-                $password = "";
-                $database = "test";
-
-                // Create connection
-                $connection = new mysqli($servername, $username, $password, $database);
-                // Check connection
-                if ($connection->connect_error) {
-                    die("Connection failed: " . $connection->connect_error);
-                }
-
-                // Read all row from database table
-                $sql = "SELECT * FROM employees";
-                $result = $connection->query($sql);
-                
-
-                if (!$result) {
-                    die("Invalid query: " . $connection->error);
-                }
-
                 // Read data of each row
                 while($row = $result->fetch_assoc()) {
                     $active = $row['active'];
-                    if (isset($_POST['active'])) {
-                        $id = intval($_POST['id']);
-                        $active = intval($_POST['active']);
-                        // Update the active value in the database
-                        $sql = "UPDATE employees SET active = $active WHERE id = $id";
-                        $connection->query($sql);
-                        $id = intval($_POST['id']);
-                        $active = intval($_POST['active']);
-                        $sql = "UPDATE employees SET active = $active WHERE id = $id";
-                        $connection->query($sql);
-                    }
-                      
-                    echo"
+                    
+                    echo "
                     <tr>
-                         <td>$row[id]</td>
-                         <td>$row[name]</td>
-                         <td>$row[lastname]</td>
-                         <td>$row[address]</td>
-                         <td>$row[phone]</td>
-                         <td>$row[email]</td>
-                         <td>$row[created_at]</td>
+                         <td>{$row['id']}</td>
+                         <td>{$row['name']}</td>
+                         <td>{$row['lastname']}</td>
+                         <td>{$row['address']}</td>
+                         <td>{$row['phone']}</td>
+                         <td>{$row['email']}</td>
+                         <td>{$row['created_at']}</td>
                          <td>
                          <form method='post'>
                          <input type='checkbox' name='active' value='1' " . ($active ? "checked" : "") . ">
-                         <input type='hidden' name='id' value='$row[id]'>
+                         <input type='hidden' name='id' value='{$row['id']}'>
                        </form>
                         </td>
                         <td>
-                              <a class='btn btn-primary btn-sm' href='/test/read.php?id=$row[id]'>View</a>
-                              <a class='btn btn-secondary btn-sm' href='/test/update.php?id=$row[id]'>Edit</a>
-                              <a class='btn btn-danger btn-sm' href='/test/delete.php?id=$row[id]'>Delete</a>
+                              <a class='btn btn-primary btn-sm' href='/test/read.php?id={$row['id']}'>View</a>
+                              <a class='btn btn-secondary btn-sm' href='/test/update.php?id={$row['id']}'>Edit</a>
+                              <a class='btn btn-danger btn-sm' href='/test/delete.php?id={$row['id']}'>Delete</a>
                     </td>
                 </tr>
                     ";
@@ -117,6 +155,54 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             </tbody>
         </table>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            const $search = $('#search');
+            const $clearBtn = $('#clear-btn');
+
+            // Handle input event on search field
+            $search.on('input', function() {
+                let query = $(this).val();
+                if (query.length > 0) {
+                    // Fetch suggestions from the server
+                    $.ajax({
+                        url: 'suggestions.php',
+                        method: 'GET',
+                        data: { query: query },
+                        success: function(data) {
+                            let suggestions = JSON.parse(data);
+                            if (suggestions.length > 0) {
+                                let suggestionsHtml = suggestions.map(item => `<div class="suggestion-item">${item}</div>`).join('');
+                                $('#suggestions').html(suggestionsHtml).show();
+                            } else {
+                                $('#suggestions').hide();
+                            }
+                        }
+                    });
+                    // Show clear button when there is input
+                    $clearBtn.show();
+                } else {
+                    $('#suggestions').hide();
+                    $clearBtn.hide();
+                }
+            });
+
+            // Handle click event on suggestion items
+            $(document).on('click', '.suggestion-item', function() {
+                $search.val($(this).text());
+                $('#suggestions').hide();
+                $clearBtn.show();
+            });
+
+            // Handle click event on clear button
+            $clearBtn.on('click', function() {
+                $search.val('');
+                $('#suggestions').hide();
+                $clearBtn.hide();
+                $search.focus();
+            });
+        });
+    </script>
 </body>
 </html>
-   
