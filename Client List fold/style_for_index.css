@@ -1,0 +1,37 @@
+#suggestions {
+    border: 1px solid #ccc;
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1000; /* Ensure suggestions appear above other content */
+}
+.suggestion-item {
+    padding: 5px;
+    cursor: pointer;
+}
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+.search-container {
+    position: relative;
+    display: inline-block;
+    margin-top: 20px; /* Add space from the upper buttons */
+}
+#search {
+    width: 300px; /* Adjust width as necessary */
+    padding-right: 30px; /* Ensure space for the clear button */
+}
+.clear-btn {
+    margin-left: 10px; /* Space between clear and search buttons */
+    display: none;
+}
+:root 
+{
+background-color: rgba(165, 210, 255, .4);
+background-image:
+linear-gradient(-45deg, rgba(165, 210, 255, .4) 50%, transparent 50%),
+linear-gradient(45deg, rgba(165, 210, 255, .2) 50%, transparent 50%);
+background-size: 40px 40px;
+ }

@@ -35,7 +35,17 @@ if (isset($_GET['query'])) {
     $sql = "SELECT * FROM employees";
 }
 
-// Execute the query
+// Determine the current page
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$perPage = 10; // Number of clients per page
+$offset = ($page - 1) * $perPage;
+
+// Get the total number of clients
+$totalClientsResult = $connection->query($sql);
+$totalClients = $totalClientsResult->num_rows;
+
+// Fetch only the clients for the current page
+$sql .= " LIMIT $perPage OFFSET $offset";
 $result = $connection->query($sql);
 
 if (!$result) {
@@ -43,11 +53,14 @@ if (!$result) {
 }
 
 // Handle form submission for activating/deactivating employees
-if (isset($_POST['active'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['active'])) {
     $id = intval($_POST['id']);
     $active = intval($_POST['active']);
     $sql = "UPDATE employees SET active = $active WHERE id = $id";
     $connection->query($sql);
+    // Redirect to avoid form resubmission
+    header("Location: index.php?page=$page&query=" . urlencode($query));
+    exit;
 }
 ?>
 
@@ -60,39 +73,9 @@ if (isset($_POST['active'])) {
     <title>My shop</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        #suggestions {
-            border: 1px solid #ccc;
-            display: none;
-            position: absolute;
-            background-color: #fff;
-            max-height: 150px;
-            overflow-y: auto;
-            z-index: 1000; /* Ensure suggestions appear above other content */
-        }
-        .suggestion-item {
-            padding: 5px;
-            cursor: pointer;
-        }
-        .suggestion-item:hover {
-            background-color: #f0f0f0;
-        }
-        .search-container {
-            position: relative;
-            display: inline-block;
-            margin-top: 20px; /* Add space from the upper buttons */
-        }
-        #search {
-            width: 300px; /* Adjust width as necessary */
-            padding-right: 30px; /* Ensure space for the clear button */
-        }
-        .clear-btn {
-            margin-left: 10px; /* Space between clear and search buttons */
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="style_for_index.css">
 </head>
-<body style="background-color: #add8e6;"> 
+<body style="background-color: rgba(165, 210, 255, .4);"> 
     <div class="container my-5">
         <h2>List of Clients</h2> 
         <a class="btn btn-success" href="/test/create.php" role="button">New Client</a>  
@@ -139,21 +122,37 @@ if (isset($_POST['active'])) {
                          <td>{$row['created_at']}</td>
                          <td>
                          <form method='post'>
-                         <input type='checkbox' name='active' value='1' " . ($active ? "checked" : "") . ">
-                         <input type='hidden' name='id' value='{$row['id']}'>
-                       </form>
-                        </td>
-                        <td>
+                             <input type='hidden' name='id' value='{$row['id']}'>
+                             <input type='hidden' name='page' value='$page'>
+                             <input type='hidden' name='query' value='" . htmlspecialchars($query) . "'>
+                             <input type='checkbox' name='active' value='1' " . ($active ? "checked" : "") . " onchange='this.form.submit()'>
+                             <input type='hidden' name='active' value='" . ($active ? "0" : "1") . "'>
+                         </form>
+                         </td>
+                         <td>
                               <a class='btn btn-primary btn-sm' href='/test/read.php?id={$row['id']}'>View</a>
                               <a class='btn btn-secondary btn-sm' href='/test/update.php?id={$row['id']}'>Edit</a>
                               <a class='btn btn-danger btn-sm' href='/test/delete.php?id={$row['id']}'>Delete</a>
-                    </td>
-                </tr>
+                         </td>
+                    </tr>
                     ";
                 }
                 ?>
             </tbody>
         </table>
+
+        <!-- Pagination -->
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <?php
+                $totalPages = ceil($totalClients / $perPage);
+                for ($i = 1; $i <= $totalPages; $i++) {
+                    $activeClass = ($i == $page) ? 'active' : '';
+                    echo "<li class='page-item $activeClass'><a class='page-link' href='index.php?page=$i&query=" . urlencode($query) . "'>$i</a></li>";
+                }
+                ?>
+            </ul>
+        </nav>
     </div>
 
     <script>

@@ -96,16 +96,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <meta charset="UTF-8">
     <title>Login</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-  display: flex;
-  align-items: center;
-  height: 100%;
-}
-/* Style the form container */
-body{ font: 14px sans-serif; }
-        .wrapper{ width: 500px; padding: 80px; }
-    </style>
+    <link rel="stylesheet" href="style_for_login.css">
 </head>
 <body>
 <body style="background-color: #add8e6;">
