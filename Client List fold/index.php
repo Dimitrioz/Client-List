@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['active'])) {
     <div class="container my-5">
         <h2>List of Clients</h2> 
         <a class="btn btn-success" href="/test/create.php" role="button">New Client</a>  
-        <a class="btn btn-warning" href="/test/logout.php" role="button">Logout</a>
+        <a class="btn btn-secondary" href="/test/logout.php" role="button">Logout</a>
         <a class="btn btn-danger" href="/test/reset_password.php" role="button">Change Your Password</a> 
         <br>
         <div class="search-container">
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['active'])) {
                          </td>
                          <td>
                               <a class='btn btn-primary btn-sm' href='/test/read.php?id={$row['id']}'>View</a>
-                              <a class='btn btn-secondary btn-sm' href='/test/update.php?id={$row['id']}'>Edit</a>
+                              <a class='btn btn-warning btn-sm' href='/test/update.php?id={$row['id']}'>Edit</a>
                               <a class='btn btn-danger btn-sm' href='/test/delete.php?id={$row['id']}'>Delete</a>
                          </td>
                     </tr>
