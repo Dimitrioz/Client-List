@@ -17,11 +17,6 @@ Comment functionality: The application allows users to make comments and read co
 
 Password management: Users can change their passwords at any time to ensure their account security.
 
-Problems:
-Active System:
-Another issue with the application is that the active system doesn't work 100%. When you change the mode to off, the program cannot storage it properly and it remains on after you restarting. 
-I'm working to resolve this issue and make the active system more reliable.
-
 Conclusion:
 
 The client list application developed by Dimitris Gkoro is an efficient tool for managing clients. 
