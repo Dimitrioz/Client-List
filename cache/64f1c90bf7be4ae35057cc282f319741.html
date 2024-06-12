@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My shop</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="style_for_index.css">
+</head>
+<body style="background-color: rgba(165, 210, 255, .4);"> 
+    <div class="container my-5">
+        <h2>List of Clients</h2> 
+        <a class="btn btn-success" href="/test/create.php" role="button">New Client</a>  
+        <a class="btn btn-secondary" href="/test/logout.php" role="button">Logout</a>
+        <a class="btn btn-danger" href="/test/reset_password.php" role="button">Change Your Password</a> 
+        <br>
+        <div class="search-container">
+            <form action="index.php" method="GET" class="d-flex">
+                <input type="text" id="search" name="query" value="sff" autocomplete="off" class="form-control">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <button type="button" class="btn btn-secondary clear-btn" id="clear-btn">Clear</button>
+                <div id="suggestions"></div>
+            </form>
+        </div>
+
+        <table class="table mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Last Name</th>
+                    <th>Address</th>
+                    <th>Phone Number</th>
+                    <th>Email</th>
+                    <th>Date</th>
+                    <th>Active</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                            </ul>
+        </nav>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            const $search = $('#search');
+            const $clearBtn = $('#clear-btn');
+
+            // Handle input event on search field
+            $search.on('input', function() {
+                let query = $(this).val();
+                if (query.length > 0) {
+                    // Fetch suggestions from the server
+                    $.ajax({
+                        url: 'suggestions.php',
+                        method: 'GET',
+                        data: { query: query },
+                        success: function(data) {
+                            let suggestions = JSON.parse(data);
+                            if (suggestions.length > 0) {
+                                let suggestionsHtml = suggestions.map(item => `<div class="suggestion-item">${item}</div>`).join('');
+                                $('#suggestions').html(suggestionsHtml).show();
+                            } else {
+                                $('#suggestions').hide();
+                            }
+                        }
+                    });
+                    // Show clear button when there is input
+                    $clearBtn.show();
+                } else {
+                    $('#suggestions').hide();
+                    $clearBtn.hide();
+                }
+            });
+
+            // Handle click event on suggestion items
+            $(document).on('click', '.suggestion-item', function() {
+                $search.val($(this).text());
+                $('#suggestions').hide();
+                $clearBtn.show();
+            });
+
+            // Handle click event on clear button
+            $clearBtn.on('click', function() {
+                $search.val('');
+                $('#suggestions').hide();
+                $clearBtn.hide();
+                $search.focus();
+            });
+        });
+    </script>
+</body>
+</html>
+

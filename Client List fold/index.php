@@ -1,4 +1,16 @@
 <?php
+// Cache configuration
+$cacheFile = 'cache/' . md5($_SERVER['REQUEST_URI']) . '.html';
+$cacheTime = 3600; // Cache for 1 hour
+
+// Serve from the cache if it is younger than $cacheTime
+if (file_exists($cacheFile) && time() - $cacheTime < filemtime($cacheFile)) {
+    readfile($cacheFile);
+    exit;
+}
+
+// Start the output buffer
+ob_start();
 // Initialize the session
 session_start();
 
@@ -205,3 +217,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['active'])) {
     </script>
 </body>
 </html>
+
+<?php
+// Save the output to a cache file
+file_put_contents($cacheFile, ob_get_contents());
+ob_end_flush();
+?>
